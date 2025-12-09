@@ -1,0 +1,125 @@
+# Example Configuration for Aerial Threat Detection Training
+# Copy this file and modify as needed for your training runs
+
+# Dataset Configuration Example
+dataset:
+  name: "aerial_threat_detection_v1"
+  path: "datasets/my-dataset"
+  classes: ["soldier", "civilian"]
+  num_classes: 2
+  
+  splits:
+    train: "train/images"
+    val: "val/images"
+    test: "test/images"
+
+# Training Configuration Example
+training:
+  model: "yolov8s.pt"  # Options: yolov8n, yolov8s, yolov8m, yolov8l, yolov8x
+  epochs: 100
+  batch_size: 16       # Adjust based on GPU memory
+  image_size: 640
+  
+  # Optimizer settings
+  optimizer: "AdamW"
+  learning_rate: 0.01
+  momentum: 0.937
+  weight_decay: 0.0005
+  
+  # Training schedule
+  warmup_epochs: 3
+  patience: 50         # Early stopping patience
+  save_period: 10      # Save checkpoint every N epochs
+  
+  # Hardware
+  device: "auto"       # Options: auto, cpu, 0, 0,1 (multi-GPU)
+  workers: 8           # Data loading threads
+
+# Data Augmentation Configuration
+augmentation:
+  # Geometric transformations
+  degrees: 0.0         # Rotation range in degrees
+  translate: 0.1       # Translation range (fraction)
+  scale: 0.5           # Scale range (0.5 = 50% to 150%)
+  shear: 0.0           # Shear range in degrees
+  perspective: 0.0     # Perspective transform magnitude
+  
+  # Flipping
+  flipud: 0.0          # Vertical flip probability
+  fliplr: 0.5          # Horizontal flip probability
+  
+  # Color augmentations
+  hsv_h: 0.015         # Hue augmentation
+  hsv_s: 0.7           # Saturation augmentation
+  hsv_v: 0.4           # Value (brightness) augmentation
+  
+  # Advanced augmentations
+  mosaic: 1.0          # Mosaic augmentation probability
+  mixup: 0.0           # MixUp augmentation probability
+  copy_paste: 0.0      # Copy-paste augmentation probability
+
+# Detection Configuration
+detection:
+  confidence_threshold: 0.5  # Minimum confidence for detections
+  iou_threshold: 0.5         # NMS IoU threshold
+  max_detections: 100        # Maximum detections per image
+
+# Performance Optimization
+optimization:
+  amp: true            # Automatic Mixed Precision (FP16)
+  half: true           # Use half precision on GPU
+  dnn: false           # Use OpenCV DNN backend
+  
+# Model Export Options
+export:
+  formats: ["onnx", "torchscript"]  # Export formats after training
+  simplify: true       # Simplify ONNX model
+  opset: 12           # ONNX opset version
+
+# Evaluation Metrics Targets
+targets:
+  mAP_0.5: 0.80       # Target mAP at IoU 0.5
+  precision: 0.85     # Target precision
+  recall: 0.80        # Target recall
+  f1_score: 0.82      # Target F1 score
+
+# Deployment Settings
+deployment:
+  model_path: "best.pt"
+  server_host: "localhost"
+  server_port: 5000
+  confidence: 0.65     # Deployment confidence threshold
+  
+# Logging and Monitoring
+logging:
+  project: "runs/train"
+  name: "aerial_threat_detector"
+  exist_ok: true
+  verbose: true
+  
+# Notes for different scenarios:
+# 
+# Fast Training (Quick Testing):
+#   model: yolov8n.pt
+#   epochs: 20
+#   batch_size: 8
+#   image_size: 416
+#
+# Balanced Training (Recommended):
+#   model: yolov8s.pt
+#   epochs: 100
+#   batch_size: 16
+#   image_size: 640
+#
+# High Accuracy (Production):
+#   model: yolov8m.pt or yolov8l.pt
+#   epochs: 200
+#   batch_size: 32
+#   image_size: 640 or 1280
+#
+# CPU Training:
+#   model: yolov8n.pt
+#   epochs: 50
+#   batch_size: 4
+#   device: cpu
+#   workers: 4

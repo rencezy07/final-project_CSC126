@@ -15,13 +15,34 @@ __pycache__/
 *.zip
 *.rar
 *.mp4
+*.avi
+*.mov
+*.mkv
 *.pt
 *.pth
 *.h5
+*.onnx
 *.exe
 *.dll
 *.bin
 
+# Training outputs
+runs/
+datasets/
+test_data/
+*.weights
+
 # OS files
 Thumbs.db
 .DS_Store
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
