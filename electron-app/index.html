@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aerial Threat Detection System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-crosshairs"></i>
+                    <h1>Aerial Threat Detection System</h1>
+                </div>
+                <div class="status-indicator">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Ready</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar Controls -->
+            <div class="sidebar">
+                <div class="control-panel">
+                    <h3><i class="fas fa-cog"></i> Control Panel</h3>
+                    
+                    <!-- Input Selection -->
+                    <div class="section">
+                        <h4>Input Source</h4>
+                        <div class="button-group">
+                            <button id="btnImage" class="btn btn-primary">
+                                <i class="fas fa-image"></i> Select Image
+                            </button>
+                            <button id="btnVideo" class="btn btn-primary">
+                                <i class="fas fa-video"></i> Select Video
+                            </button>
+                            <button id="btnWebcam" class="btn btn-primary">
+                                <i class="fas fa-camera"></i> Start Webcam
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Detection Controls -->
+                    <div class="section">
+                        <h4>Detection</h4>
+                        <div class="button-group">
+                            <button id="btnStartDetection" class="btn btn-success" disabled>
+                                <i class="fas fa-play"></i> Start Detection
+                            </button>
+                            <button id="btnStopDetection" class="btn btn-danger" disabled>
+                                <i class="fas fa-stop"></i> Stop Detection
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="section">
+                        <h4>Settings</h4>
+                        <div class="setting-item">
+                            <label for="confidenceSlider">Confidence Threshold:</label>
+                            <div class="slider-container">
+                                <input type="range" id="confidenceSlider" min="0.1" max="1.0" step="0.1" value="0.5">
+                                <span id="confidenceValue">0.5</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label for="showLabels">
+                                <input type="checkbox" id="showLabels" checked> Show Labels
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label for="showConfidence">
+                                <input type="checkbox" id="showConfidence" checked> Show Confidence
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Export Options -->
+                    <div class="section">
+                        <h4>Export</h4>
+                        <div class="button-group">
+                            <button id="btnSaveResults" class="btn btn-secondary" disabled>
+                                <i class="fas fa-save"></i> Save Results
+                            </button>
+                            <button id="btnExportVideo" class="btn btn-secondary" disabled>
+                                <i class="fas fa-download"></i> Export Video
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detection Statistics -->
+                <div class="stats-panel">
+                    <h3><i class="fas fa-chart-bar"></i> Detection Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Detections:</span>
+                            <span class="stat-value" id="totalDetections">0</span>
+                        </div>
+                        <div class="stat-item soldier">
+                            <span class="stat-label">Soldiers:</span>
+                            <span class="stat-value" id="soldierCount">0</span>
+                        </div>
+                        <div class="stat-item civilian">
+                            <span class="stat-label">Civilians:</span>
+                            <span class="stat-value" id="civilianCount">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Avg. Confidence:</span>
+                            <span class="stat-value" id="avgConfidence">0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Display Area -->
+            <div class="display-area">
+                <div class="video-container">
+                    <div class="video-wrapper">
+                        <canvas id="detectionCanvas" width="800" height="600"></canvas>
+                        <div class="video-overlay">
+                            <div class="drop-zone" id="dropZone">
+                                <div class="drop-content">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Drop image or video files here</p>
+                                    <p>or use the buttons to select input source</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Controls -->
+                    <div class="video-controls" id="videoControls" style="display: none;">
+                        <button id="playPauseBtn" class="control-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="progress-container">
+                            <input type="range" id="progressSlider" min="0" max="100" value="0">
+                        </div>
+                        <span id="timeDisplay">00:00 / 00:00</span>
+                        <button id="muteBtn" class="control-btn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="volume-container">
+                            <input type="range" id="volumeSlider" min="0" max="100" value="50">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detection Results Panel -->
+                <div class="results-panel">
+                    <div class="results-header">
+                        <h3><i class="fas fa-list"></i> Detection Results</h3>
+                        <button id="clearResults" class="btn btn-small">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                    </div>
+                    <div class="results-content" id="resultsContent">
+                        <div class="no-results">
+                            <i class="fas fa-search"></i>
+                            <p>No detections yet. Select an input source and start detection.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <span>Aerial Threat Detection System v1.0.0</span>
+                </div>
+                <div class="footer-right">
+                    <span id="processingInfo">Ready for processing</span>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p id="loadingText">Processing...</p>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal" id="settingsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Detection Settings</h3>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="setting-group">
+                        <h4>Model Settings</h4>
+                        <div class="setting-item">
+                            <label for="modelPath">Model Path:</label>
+                            <div class="input-group">
+                                <input type="text" id="modelPath" value="../best.pt" readonly>
+                                <button id="browseModel" class="btn btn-small">Browse</button>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label for="deviceSelect">Device:</label>
+                            <select id="deviceSelect">
+                                <option value="auto">Auto Detect</option>
+                                <option value="cpu">CPU</option>
+                                <option value="cuda">GPU (CUDA)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4>Detection Parameters</h4>
+                        <div class="setting-item">
+                            <label for="iouThreshold">IoU Threshold:</label>
+                            <input type="range" id="iouThreshold" min="0.1" max="1.0" step="0.1" value="0.5">
+                            <span id="iouValue">0.5</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="maxDetections">Max Detections:</label>
+                            <input type="number" id="maxDetections" min="1" max="1000" value="100">
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h4>Visualization</h4>
+                        <div class="setting-item">
+                            <label for="boxThickness">Box Thickness:</label>
+                            <input type="range" id="boxThickness" min="1" max="10" step="1" value="2">
+                            <span id="boxThicknessValue">2</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="fontScale">Font Scale:</label>
+                            <input type="range" id="fontScale" min="0.3" max="2.0" step="0.1" value="0.6">
+                            <span id="fontScaleValue">0.6</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="saveSettings" class="btn btn-success">Save Settings</button>
+                    <button id="cancelSettings" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="renderer.js"></script>
+</body>
+</html>
