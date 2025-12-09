@@ -12,7 +12,6 @@ from pathlib import Path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from aerial_threat_detector import AerialThreatDetector
-from utils.evaluation_utils import EvaluationMetrics
 import cv2
 import json
 import numpy as np

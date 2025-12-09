@@ -5,6 +5,7 @@ Trains YOLOv8 model on soldier and civilian classification dataset
 
 import os
 import argparse
+import shutil
 from ultralytics import YOLO
 import torch
 import yaml
@@ -149,7 +150,6 @@ def train_model(
     # Save best model to root directory
     best_model_path = Path(project) / name / 'weights' / 'best.pt'
     if best_model_path.exists():
-        import shutil
         output_path = 'best.pt'
         shutil.copy(best_model_path, output_path)
         print(f"\nBest model copied to: {output_path}")
