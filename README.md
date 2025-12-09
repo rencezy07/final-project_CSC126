@@ -46,18 +46,45 @@ Input Source → YOLO Detector → Detection Server → Electron App → User In
 
 ## 🚀 Quick Start
 
+**📖 New to the project? See the [Quick Start Guide](docs/Quick_Start.md) for a 5-minute setup!**
+
 ### Easy Setup (Recommended)
 1. **Double-click `start_app.bat`** - This will automatically:
    - Install all required dependencies
    - Start the detection server
    - Launch the Electron application
 
+### Get a Trained Model
+
+**Option 1: Train Your Own Model (Recommended)**
+```bash
+# 1. Download dataset from Roboflow
+python download_dataset.py download \
+  --api-key YOUR_API_KEY \
+  --workspace militarypersons \
+  --project uav-person-3 \
+  --version 1 \
+  --output dataset
+
+# 2. Train the model
+python train_model.py --dataset dataset --epochs 100
+
+# Model will be saved as 'best.pt'
+```
+
+**Option 2: Use Pre-trained Base Model (For Testing)**
+```bash
+# Download YOLOv8 base model (not specifically trained for soldiers/civilians)
+python -c "from ultralytics import YOLO; YOLO('yolov8n.pt')"
+mv yolov8n.pt best.pt
+```
+
 ### Manual Setup
 If you prefer manual setup or the batch file doesn't work:
 
 1. **Install Python Dependencies**:
    ```bash
-   pip install flask flask-socketio opencv-python ultralytics torch torchvision
+   pip install -r requirements.txt
    ```
 
 2. **Install Node.js Dependencies**:
@@ -250,38 +277,68 @@ detector.detect_webcam()
 
 ## 📊 Model Performance
 
-### Evaluation Metrics
+### Target Metrics
 
 The system provides comprehensive evaluation tools to assess model performance:
 
-```python
-from src.utils.evaluation_utils import EvaluationMetrics
+| Metric | Minimum | Good | Excellent |
+|--------|---------|------|-----------|
+| **mAP@0.5** | 0.70 | 0.85 | 0.95+ |
+| **Precision** | 0.75 | 0.85 | 0.95+ |
+| **Recall** | 0.70 | 0.80 | 0.90+ |
+| **F1-Score** | 0.72 | 0.82 | 0.92+ |
 
-# Initialize evaluator
-evaluator = EvaluationMetrics()
+### Model Training
 
-# Add detection results
-for detection in detections:
-    evaluator.add_detection(
-        predicted_class=detection['class_name'],
-        actual_class=ground_truth_class,
-        confidence=detection['confidence'],
-        iou=calculated_iou
-    )
+**📚 For complete training instructions, see [Training Guide](docs/Training_Guide.md)**
 
-# Calculate and display metrics
-evaluator.print_metrics()
-evaluator.save_metrics_plot("performance_metrics.png")
+#### Quick Training
+
+```bash
+# 1. Download dataset
+python download_dataset.py download \
+  --api-key YOUR_ROBOFLOW_API_KEY \
+  --workspace militarypersons \
+  --project uav-person-3 \
+  --version 1 \
+  --output dataset
+
+# 2. Train model
+python train_model.py \
+  --dataset dataset \
+  --model yolov8s \
+  --epochs 100 \
+  --batch 16
 ```
 
-### Expected Performance Indicators
+#### Available Datasets
 
-| Metric | Target Value | Description |
-|--------|--------------|-------------|
-| **Precision** | > 0.85 | Accuracy of positive predictions |
-| **Recall** | > 0.80 | Coverage of actual positives |
-| **F1-Score** | > 0.82 | Harmonic mean of precision and recall |
-| **mAP@0.5** | > 0.80 | Mean Average Precision at IoU 0.5 |
+See [Dataset Information](docs/Dataset_Information.md) for complete details on:
+- UAV Person Detection Dataset
+- Combatant Detection Dataset
+- Soldiers Detection Dataset
+- Look Down Folks Dataset
+
+All datasets are available on [Roboflow Universe](https://universe.roboflow.com/)
+
+### Evaluation
+
+Evaluate your trained model:
+
+```bash
+python examples/evaluation_example.py \
+  --model best.pt \
+  --dataset-yaml dataset/data.yaml \
+  --test-images test_images/ \
+  --output evaluation_results
+```
+
+This generates:
+- Precision, Recall, F1-Score metrics
+- mAP@0.5 and mAP@0.5:0.95
+- Confusion matrix
+- Per-class performance analysis
+- Visualization plots
 
 ### Real-world Performance Considerations
 
@@ -389,47 +446,83 @@ npm run dev
 ## 📁 Project Structure
 
 ```
-csc-final/
-├── best.pt                          # Trained YOLO model
+final-project_CSC126/
+├── best.pt                          # Trained YOLO model (not in repo, see training guide)
 ├── requirements.txt                 # Python dependencies
-├── README.md                       # This file
+├── README.md                        # This file
+├── train_model.py                   # Model training script
+├── download_dataset.py              # Dataset download/preparation utility
 │
-├── src/                            # Core Python modules
-│   ├── aerial_threat_detector.py   # Main detection class
-│   ├── detection_server.py         # Flask-SocketIO server
+├── src/                             # Core Python modules
+│   ├── aerial_threat_detector.py    # Main detection class
+│   ├── detection_server.py          # Flask-SocketIO server
 │   └── utils/
-│       └── evaluation_utils.py     # Performance evaluation tools
+│       ├── evaluation_utils.py      # Performance evaluation tools
+│       └── __init__.py
 │
-├── electron-app/                   # Electron GUI application
-│   ├── package.json               # Node.js dependencies
-│   ├── main.js                    # Electron main process
-│   ├── index.html                 # Main application window
-│   ├── styles.css                 # Application styling
-│   └── renderer.js                # Frontend JavaScript
+├── electron-app/                    # Electron GUI application
+│   ├── package.json                 # Node.js dependencies
+│   ├── main.js                      # Electron main process
+│   ├── index.html                   # Main application window
+│   ├── styles.css                   # Application styling
+│   └── renderer.js                  # Frontend JavaScript
 │
-├── test_data/                     # Sample test files
-├── docs/                          # Additional documentation
-│   ├── API_Reference.md           # API documentation
-│   ├── User_Manual.pdf            # Detailed user guide
-│   └── Technical_Report.md        # Technical implementation details
+├── docs/                            # Comprehensive documentation
+│   ├── Quick_Start.md               # 5-minute quick start guide
+│   ├── Training_Guide.md            # Complete model training guide
+│   ├── Dataset_Information.md       # Dataset sources and info
+│   ├── Ethical_Considerations.md    # Ethical guidelines and compliance
+│   ├── Presentation_Template.md     # Project presentation template
+│   └── Technical_Report.md          # Technical implementation details
 │
-└── examples/                      # Usage examples
-    ├── basic_usage.py             # Simple detection examples
-    ├── batch_processing.py        # Batch processing script
-    └── evaluation_example.py      # Model evaluation example
+└── examples/                        # Usage examples and scripts
+    ├── basic_usage.py               # Simple detection examples
+    ├── batch_processing.py          # Batch processing script
+    └── evaluation_example.py        # Model evaluation script
 ```
 
 ## 🚀 Advanced Features
 
-### Batch Processing
+### Example Scripts
 
-Process multiple files automatically:
+The `examples/` directory contains ready-to-use scripts:
 
-```python
-from src.utils.batch_processor import BatchProcessor
+#### 1. Basic Usage Examples
+```bash
+python examples/basic_usage.py
+```
+Interactive menu with:
+- Single image detection
+- Video file processing
+- Real-time webcam detection
+- Custom confidence thresholds
+- Batch image processing
+- Frame-by-frame processing
 
-processor = BatchProcessor("best.pt")
-results = processor.process_directory("input_folder/", "output_folder/")
+#### 2. Batch Processing
+```bash
+# Process multiple images
+python examples/batch_processing.py \
+  --model best.pt \
+  --input test_images/ \
+  --output results/ \
+  --type images
+
+# Process multiple videos
+python examples/batch_processing.py \
+  --model best.pt \
+  --input test_videos/ \
+  --output results/ \
+  --type videos
+```
+
+#### 3. Model Evaluation
+```bash
+python examples/evaluation_example.py \
+  --model best.pt \
+  --dataset-yaml dataset/data.yaml \
+  --test-images test_images/ \
+  --output evaluation_results
 ```
 
 ### Custom Model Integration
@@ -461,6 +554,71 @@ def detect():
     # Handle image upload and return detections
     pass
 ```
+
+## 📚 Documentation
+
+### Complete Guides
+
+- **[Quick Start Guide](docs/Quick_Start.md)** - Get started in 5 minutes
+- **[Training Guide](docs/Training_Guide.md)** - Complete model training instructions
+- **[Dataset Information](docs/Dataset_Information.md)** - Dataset sources and preparation
+- **[Ethical Considerations](docs/Ethical_Considerations.md)** - Ethical guidelines and compliance
+- **[Technical Report](docs/Technical_Report.md)** - Technical implementation details
+- **[Presentation Template](docs/Presentation_Template.md)** - Project presentation guide
+
+### Key Topics
+
+#### Getting Started
+1. Install dependencies
+2. Download or train a model
+3. Run the application
+4. Test detection capabilities
+
+#### Model Training
+1. Get Roboflow API key
+2. Download datasets
+3. Configure training parameters
+4. Train and evaluate model
+
+#### Deployment
+1. Review ethical guidelines
+2. Ensure legal compliance
+3. Implement human oversight
+4. Monitor performance
+
+### External Resources
+
+- [YOLOv8 Documentation](https://docs.ultralytics.com/)
+- [Roboflow Tutorials](https://roboflow.com/tutorials)
+- [OpenCV Documentation](https://docs.opencv.org/)
+- [Electron Documentation](https://www.electronjs.org/docs)
+
+## ⚠️ Ethical Notice
+
+### Educational Purpose
+
+This system is designed for:
+- ✅ Educational demonstration
+- ✅ Research and development
+- ✅ Proof of concept
+- ✅ Academic learning
+
+### Not Intended For
+
+- ❌ Production military applications without oversight
+- ❌ Autonomous targeting systems
+- ❌ Privacy-invasive surveillance
+- ❌ Discriminatory applications
+
+### Important Principles
+
+1. **Human Oversight Required:** All critical decisions must have human approval
+2. **Privacy Protection:** Comply with data protection laws (GDPR, CCPA, etc.)
+3. **Civilian Safety:** Prioritize protection of non-combatants
+4. **Transparency:** Document all system use and limitations
+5. **Accountability:** Maintain clear responsibility chains
+
+**📖 Read the complete [Ethical Considerations Guide](docs/Ethical_Considerations.md)**
 
 ## 🤝 Contributing
 
