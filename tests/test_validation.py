@@ -217,8 +217,8 @@ class TestDocumentation(unittest.TestCase):
         # Check for key sections
         key_sections = [
             'Model Design',
-            'Performance Evaluation',
-            'Deployment Recommendations',
+            'Performance Analysis',
+            'Real-World Deployment',
             'Ethical Considerations',
             'Conclusion'
         ]
