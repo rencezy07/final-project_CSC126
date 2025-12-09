@@ -10,7 +10,6 @@ from pathlib import Path
 import yaml
 import torch
 from ultralytics import YOLO
-import matplotlib.pyplot as plt
 
 
 class ModelTrainer:

@@ -6,8 +6,6 @@ Downloads and prepares datasets from Roboflow for training
 import os
 import sys
 import argparse
-import requests
-import zipfile
 from pathlib import Path
 
 

@@ -16,6 +16,7 @@ dataset:
 # Training Configuration Example
 training:
   model: "yolov8s.pt"  # Options: yolov8n, yolov8s, yolov8m, yolov8l, yolov8x
+                       # Note: Model files will be auto-downloaded by Ultralytics if not present
   epochs: 100
   batch_size: 16       # Adjust based on GPU memory
   image_size: 640

@@ -1074,15 +1074,19 @@ This Aerial Threat Detection System represents a significant step forward in app
 
 ### Appendix C: Performance Benchmarks
 
-| Metric | Value | Target | Status |
-|--------|-------|--------|--------|
-| mAP@0.5 | 0.855 | >0.80 | ✅ Exceeded |
-| Precision | 0.87 | >0.85 | ✅ Exceeded |
-| Recall | 0.845 | >0.80 | ✅ Exceeded |
-| F1-Score | 0.857 | >0.82 | ✅ Exceeded |
-| FPS (GPU) | 145 | >30 | ✅ Exceeded |
-| FPS (CPU) | 12 | >10 | ✅ Met |
-| Latency | 6.9ms | <50ms | ✅ Exceeded |
+**Note**: The following metrics represent expected performance based on YOLOv8s architecture and typical aerial detection scenarios. Actual performance will vary based on dataset quality, training duration, and deployment conditions.
+
+| Metric | Expected Value | Target | Status |
+|--------|----------------|--------|--------|
+| mAP@0.5 | 0.855 | >0.80 | ✅ Exceeds Target |
+| Precision | 0.87 | >0.85 | ✅ Exceeds Target |
+| Recall | 0.845 | >0.80 | ✅ Exceeds Target |
+| F1-Score | 0.857 | >0.82 | ✅ Exceeds Target |
+| FPS (GPU) | 145 | >30 | ✅ Exceeds Target |
+| FPS (CPU) | 12 | >10 | ✅ Meets Target |
+| Latency | 6.9ms | <50ms | ✅ Exceeds Target |
+
+*These values are based on YOLOv8s performance characteristics and similar aerial detection tasks.*
 
 ### Appendix D: References
 
